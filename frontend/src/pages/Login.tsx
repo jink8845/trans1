@@ -1,13 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authApi } from '../services/api';
 
 const Login: React.FC = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState('test');
+  const [password, setPassword] = useState('test');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  // 自动登录功能
+  useEffect(() => {
+    const autoLogin = async () => {
+      // 检查是否已登录
+      if (localStorage.getItem('token')) {
+        navigate('/');
+        return;
+      }
+
+      // 自动登录
+      setLoading(true);
+      try {
+        const response = await authApi.login(username, password);
+        localStorage.setItem('token', response.data.access_token);
+        navigate('/');
+      } catch (err: any) {
+        setError(err.response?.data?.detail || '自动登录失败，请手动登录');
+        setLoading(false);
+      }
+    };
+
+    autoLogin();
+  }, [username, password, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
