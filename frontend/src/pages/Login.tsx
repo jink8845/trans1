@@ -1,0 +1,87 @@
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { authApi } from '../services/api';
+
+const Login: React.FC = () => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    try {
+      const response = await authApi.login(username, password);
+      localStorage.setItem('token', response.data.access_token);
+      navigate('/');
+    } catch (err: any) {
+      setError(err.response?.data?.detail || '登录失败，请检查用户名和密码');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+        <h2 className="text-2xl font-bold text-center text-dark mb-6">SAP 需求管理系统</h2>
+        <h3 className="text-lg font-medium text-center text-gray-600 mb-8">用户登录</h3>
+
+        {error && (
+          <div className="bg-red-100 text-red-700 p-3 rounded mb-4">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label htmlFor="username" className="block text-gray-700 mb-2">
+              用户名
+            </label>
+            <input
+              type="text"
+              id="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary"
+              required
+            />
+          </div>
+
+          <div className="mb-6">
+            <label htmlFor="password" className="block text-gray-700 mb-2">
+              密码
+            </label>
+            <input
+              type="password"
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary"
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-primary text-white py-2 rounded hover:bg-blue-600 transition-colors disabled:bg-gray-400"
+            disabled={loading}
+          >
+            {loading ? '登录中...' : '登录'}
+          </button>
+        </form>
+
+        <div className="mt-6 text-center text-sm text-gray-600">
+          <p>演示账号：任意用户名</p>
+          <p>演示密码：任意密码</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Login;
