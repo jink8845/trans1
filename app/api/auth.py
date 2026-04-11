@@ -39,16 +39,22 @@ def get_admin_user(current_user = Depends(get_current_user)):
         )
     return current_user
 
+from pydantic import BaseModel
+
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
 @router.post("/login", response_model=Token)
-async def login(username: str, password: str, db: Session = Depends(get_db)):
+async def login(login_data: LoginRequest, db: Session = Depends(get_db)):
     """用户登录"""
     # 实际环境中，这里应该验证密码
     # 这里为了演示，我们简化处理，只要用户名存在就登录成功
     repo = UserRepository(db)
-    user = repo.get_by_username(username)
+    user = repo.get_by_username(login_data.username)
     if not user:
         # 如果用户不存在，自动创建一个
-        user = repo.create(username, "user")
+        user = repo.create(login_data.username, "user")
     
     # 创建访问令牌
     access_token = create_access_token(data={"sub": user.username})
