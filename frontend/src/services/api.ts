@@ -27,7 +27,20 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    // 处理 401 未授权错误
     if (error.response && error.response.status === 401) {
+      // 清除 token 并跳转到登录页
+      localStorage.removeItem('token');
+      window.location.href = '/login';
+    }
+    // 处理 invalid session token 错误
+    else if (error.response && error.response.data && error.response.data.error === 'invalid session token') {
+      // 清除 token 并跳转到登录页
+      localStorage.removeItem('token');
+      window.location.href = '/login';
+    }
+    // 处理其他认证相关错误
+    else if (error.message && (error.message.includes('invalid token') || error.message.includes('session'))) {
       // 清除 token 并跳转到登录页
       localStorage.removeItem('token');
       window.location.href = '/login';
