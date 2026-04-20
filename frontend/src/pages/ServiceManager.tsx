@@ -7,6 +7,10 @@ const ServiceManager: React.FC = () => {
   const [frontendStatus, setFrontendStatus] = useState<'unknown' | 'running' | 'stopped'>('unknown');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
+  const [progress, setProgress] = useState(0);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [currentAction, setCurrentAction] = useState('');
   const navigate = useNavigate();
 
   // 检查服务状态
@@ -47,68 +51,164 @@ const ServiceManager: React.FC = () => {
   // 启动后端服务
   const startBackendService = async () => {
     setIsLoading(true);
+    setIsProcessing(true);
+    setCurrentAction('启动后端服务');
     setError('');
+    setMessage('正在启动后端服务...');
+    setProgress(0);
+    
     try {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      setProgress(30);
+      setMessage('调用后端 API...');
+      
       await serviceApi.startBackend();
+      setProgress(60);
+      setMessage('等待服务启动...');
+      
       // 等待服务启动
       await new Promise(resolve => setTimeout(resolve, 3000));
+      setProgress(80);
+      setMessage('检查服务状态...');
+      
       // 重新检查状态
       await checkServiceStatus();
+      setProgress(100);
+      setMessage('后端服务启动成功！');
+      
+      // 保持成功消息显示一段时间
+      await new Promise(resolve => setTimeout(resolve, 1500));
     } catch (err: any) {
       setError(err.response?.data?.detail || '启动后端服务失败');
+      setMessage('');
     } finally {
       setIsLoading(false);
+      setIsProcessing(false);
+      setCurrentAction('');
+      setProgress(0);
     }
   };
 
   // 停止后端服务
   const stopBackendService = async () => {
     setIsLoading(true);
+    setIsProcessing(true);
+    setCurrentAction('停止后端服务');
     setError('');
+    setMessage('正在停止后端服务...');
+    setProgress(0);
+    
     try {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      setProgress(30);
+      setMessage('调用后端 API...');
+      
       await serviceApi.stopBackend();
+      setProgress(60);
+      setMessage('等待服务停止...');
+      
       // 等待服务停止
       await new Promise(resolve => setTimeout(resolve, 2000));
+      setProgress(80);
+      setMessage('检查服务状态...');
+      
       // 重新检查状态
       await checkServiceStatus();
+      setProgress(100);
+      setMessage('后端服务停止成功！');
+      
+      // 保持成功消息显示一段时间
+      await new Promise(resolve => setTimeout(resolve, 1500));
     } catch (err: any) {
       setError(err.response?.data?.detail || '停止后端服务失败');
+      setMessage('');
     } finally {
       setIsLoading(false);
+      setIsProcessing(false);
+      setCurrentAction('');
+      setProgress(0);
     }
   };
 
   // 启动前端服务
   const startFrontendService = async () => {
     setIsLoading(true);
+    setIsProcessing(true);
+    setCurrentAction('启动前端服务');
     setError('');
+    setMessage('正在启动前端服务...');
+    setProgress(0);
+    
     try {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      setProgress(30);
+      setMessage('调用后端 API...');
+      
       await serviceApi.startFrontend();
+      setProgress(60);
+      setMessage('等待服务启动...');
+      
       // 等待服务启动
       await new Promise(resolve => setTimeout(resolve, 3000));
+      setProgress(80);
+      setMessage('检查服务状态...');
+      
       // 重新检查状态
       await checkServiceStatus();
+      setProgress(100);
+      setMessage('前端服务启动成功！');
+      
+      // 保持成功消息显示一段时间
+      await new Promise(resolve => setTimeout(resolve, 1500));
     } catch (err: any) {
       setError(err.response?.data?.detail || '启动前端服务失败');
+      setMessage('');
     } finally {
       setIsLoading(false);
+      setIsProcessing(false);
+      setCurrentAction('');
+      setProgress(0);
     }
   };
 
   // 停止前端服务
   const stopFrontendService = async () => {
     setIsLoading(true);
+    setIsProcessing(true);
+    setCurrentAction('停止前端服务');
     setError('');
+    setMessage('正在停止前端服务...');
+    setProgress(0);
+    
     try {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      setProgress(30);
+      setMessage('调用后端 API...');
+      
       await serviceApi.stopFrontend();
+      setProgress(60);
+      setMessage('等待服务停止...');
+      
       // 等待服务停止
       await new Promise(resolve => setTimeout(resolve, 2000));
+      setProgress(80);
+      setMessage('检查服务状态...');
+      
       // 重新检查状态
       await checkServiceStatus();
+      setProgress(100);
+      setMessage('前端服务停止成功！');
+      
+      // 保持成功消息显示一段时间
+      await new Promise(resolve => setTimeout(resolve, 1500));
     } catch (err: any) {
       setError(err.response?.data?.detail || '停止前端服务失败');
+      setMessage('');
     } finally {
       setIsLoading(false);
+      setIsProcessing(false);
+      setCurrentAction('');
+      setProgress(0);
     }
   };
 
@@ -149,6 +249,25 @@ const ServiceManager: React.FC = () => {
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
             {error}
+          </div>
+        )}
+
+        {isProcessing && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
+            <div className="mb-2">
+              <h3 className="font-medium text-blue-800">{currentAction}</h3>
+            </div>
+            <div className="mb-2">
+              <div className="w-full bg-gray-200 rounded-full h-4">
+                <div 
+                  className="bg-blue-600 h-4 rounded-full transition-all duration-300"
+                  style={{ width: `${progress}%` }}
+                ></div>
+              </div>
+            </div>
+            <div>
+              <p className="text-blue-700">{message}</p>
+            </div>
           </div>
         )}
 
