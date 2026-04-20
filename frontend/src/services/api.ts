@@ -105,4 +105,18 @@ export const authApi = {
     api.post('/auth/users', data),
 };
 
+// 服务管理 API
+export const serviceApi = {
+  getStatus: () =>
+    api.get('/service/status'),
+  startBackend: () =>
+    api.post('/service/start-backend'),
+  stopBackend: () =>
+    api.post('/service/stop-backend'),
+  startFrontend: () =>
+    api.post('/service/start-frontend'),
+  stopFrontend: () =>
+    api.post('/service/stop-frontend'),
+};
+
 export default api;

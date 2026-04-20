@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { serviceApi } from '../services/api';
 
 const ServiceManager: React.FC = () => {
   const [backendStatus, setBackendStatus] = useState<'unknown' | 'running' | 'stopped'>('unknown');
@@ -11,27 +12,35 @@ const ServiceManager: React.FC = () => {
   // 检查服务状态
   const checkServiceStatus = async () => {
     try {
-      // 检查后端服务
-      const backendResponse = await fetch('http://localhost:8000/health');
-      if (backendResponse.ok) {
-        setBackendStatus('running');
-      } else {
+      const response = await serviceApi.getStatus();
+      setBackendStatus(response.data.backend as 'running' | 'stopped');
+      setFrontendStatus(response.data.frontend as 'running' | 'stopped');
+    } catch (error) {
+      console.error('获取服务状态失败:', error);
+      // 失败时回退到原始检查方法
+      try {
+        // 检查后端服务
+        const backendResponse = await fetch('http://localhost:8000/health');
+        if (backendResponse.ok) {
+          setBackendStatus('running');
+        } else {
+          setBackendStatus('stopped');
+        }
+      } catch {
         setBackendStatus('stopped');
       }
-    } catch {
-      setBackendStatus('stopped');
-    }
 
-    try {
-      // 检查前端服务
-      const frontendResponse = await fetch('http://localhost:5173');
-      if (frontendResponse.ok) {
-        setFrontendStatus('running');
-      } else {
+      try {
+        // 检查前端服务
+        const frontendResponse = await fetch('http://localhost:5173');
+        if (frontendResponse.ok) {
+          setFrontendStatus('running');
+        } else {
+          setFrontendStatus('stopped');
+        }
+      } catch {
         setFrontendStatus('stopped');
       }
-    } catch {
-      setFrontendStatus('stopped');
     }
   };
 
@@ -40,13 +49,13 @@ const ServiceManager: React.FC = () => {
     setIsLoading(true);
     setError('');
     try {
-      // 这里应该调用后端启动服务的 API
-      // 由于我们没有这个 API，这里模拟启动
-      // 实际项目中，应该通过后端 API 来管理服务
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      setBackendStatus('running');
-    } catch (err) {
-      setError('启动后端服务失败');
+      await serviceApi.startBackend();
+      // 等待服务启动
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      // 重新检查状态
+      await checkServiceStatus();
+    } catch (err: any) {
+      setError(err.response?.data?.detail || '启动后端服务失败');
     } finally {
       setIsLoading(false);
     }
@@ -57,12 +66,13 @@ const ServiceManager: React.FC = () => {
     setIsLoading(true);
     setError('');
     try {
-      // 这里应该调用后端停止服务的 API
-      // 由于我们没有这个 API，这里模拟停止
+      await serviceApi.stopBackend();
+      // 等待服务停止
       await new Promise(resolve => setTimeout(resolve, 2000));
-      setBackendStatus('stopped');
-    } catch (err) {
-      setError('停止后端服务失败');
+      // 重新检查状态
+      await checkServiceStatus();
+    } catch (err: any) {
+      setError(err.response?.data?.detail || '停止后端服务失败');
     } finally {
       setIsLoading(false);
     }
@@ -73,12 +83,13 @@ const ServiceManager: React.FC = () => {
     setIsLoading(true);
     setError('');
     try {
-      // 这里应该调用前端启动服务的 API
-      // 由于我们没有这个 API，这里模拟启动
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      setFrontendStatus('running');
-    } catch (err) {
-      setError('启动前端服务失败');
+      await serviceApi.startFrontend();
+      // 等待服务启动
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      // 重新检查状态
+      await checkServiceStatus();
+    } catch (err: any) {
+      setError(err.response?.data?.detail || '启动前端服务失败');
     } finally {
       setIsLoading(false);
     }
@@ -89,12 +100,13 @@ const ServiceManager: React.FC = () => {
     setIsLoading(true);
     setError('');
     try {
-      // 这里应该调用前端停止服务的 API
-      // 由于我们没有这个 API，这里模拟停止
+      await serviceApi.stopFrontend();
+      // 等待服务停止
       await new Promise(resolve => setTimeout(resolve, 2000));
-      setFrontendStatus('stopped');
-    } catch (err) {
-      setError('停止前端服务失败');
+      // 重新检查状态
+      await checkServiceStatus();
+    } catch (err: any) {
+      setError(err.response?.data?.detail || '停止前端服务失败');
     } finally {
       setIsLoading(false);
     }
