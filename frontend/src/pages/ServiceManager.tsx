@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Layout from '../components/Layout';
 import { serviceApi } from '../services/api';
 
 const ServiceManager: React.FC = () => {
@@ -242,9 +243,9 @@ const ServiceManager: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-center text-gray-800 mb-8">服务管理</h1>
+    <Layout>
+      <div className="space-y-6">
+        <h1 className="text-2xl font-bold text-dark">服务管理</h1>
 
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
@@ -271,8 +272,8 @@ const ServiceManager: React.FC = () => {
           </div>
         )}
 
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-          <h2 className="text-xl font-semibold mb-4">服务状态</h2>
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <h2 className="text-lg font-medium text-gray-700 mb-4">服务状态</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* 后端服务状态 */}
@@ -285,7 +286,7 @@ const ServiceManager: React.FC = () => {
                 <button
                   onClick={startBackendService}
                   disabled={backendStatus === 'running' || isLoading}
-                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  className="px-4 py-2 bg-primary text-white rounded hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
                 >
                   启动
                 </button>
@@ -309,7 +310,7 @@ const ServiceManager: React.FC = () => {
                 <button
                   onClick={startFrontendService}
                   disabled={frontendStatus === 'running' || isLoading}
-                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  className="px-4 py-2 bg-primary text-white rounded hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
                 >
                   启动
                 </button>
@@ -325,8 +326,8 @@ const ServiceManager: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-semibold mb-4">项目管理</h2>
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <h2 className="text-lg font-medium text-gray-700 mb-4">项目管理</h2>
           <button
             onClick={openProject}
             disabled={backendStatus !== 'running' || frontendStatus !== 'running'}
@@ -339,7 +340,7 @@ const ServiceManager: React.FC = () => {
           </p>
         </div>
 
-        <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
           <h3 className="font-medium text-blue-800 mb-2">服务信息</h3>
           <ul className="space-y-2 text-sm text-blue-700">
             <li>后端服务地址: http://localhost:8000</li>
@@ -348,7 +349,7 @@ const ServiceManager: React.FC = () => {
           </ul>
         </div>
       </div>
-    </div>
+    </Layout>
   );
 };
 
