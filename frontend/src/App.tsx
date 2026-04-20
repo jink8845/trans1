@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard';
 import SAPOperations from './pages/SAPOperations';
 import Requests from './pages/Requests';
 import Config from './pages/Config';
+import ServiceManager from './pages/ServiceManager';
 
 const App: React.FC = () => {
   // 检查是否已登录
@@ -28,6 +29,7 @@ const App: React.FC = () => {
         <Route path="/sap" element={<ProtectedRoute><SAPOperations /></ProtectedRoute>} />
         <Route path="/requests" element={<ProtectedRoute><Requests /></ProtectedRoute>} />
         <Route path="/config" element={<ProtectedRoute><Config /></ProtectedRoute>} />
+        <Route path="/service" element={<ProtectedRoute><ServiceManager /></ProtectedRoute>} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>

@@ -20,6 +20,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     { name: 'SAP Operations', path: '/sap' },
     { name: 'Requests', path: '/requests' },
     { name: 'Config', path: '/config' },
+    { name: '服务管理', path: '/service' },
   ];
 
   return (
