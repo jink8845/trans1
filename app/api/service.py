@@ -12,7 +12,8 @@ def check_service_status(port):
     for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
         try:
             cmdline = ' '.join(proc.cmdline())
-            if f':{port}' in cmdline:
+            # 检查端口是否在命令行中
+            if f'port {port}' in cmdline or f'--port {port}' in cmdline or f':{port}' in cmdline:
                 return True, proc.pid
         except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
             pass
@@ -43,14 +44,23 @@ async def start_backend_service():
 @router.post("/stop-backend")
 async def stop_backend_service():
     """停止后端服务"""
-    # 检查是否在运行
-    is_running, pid = check_service_status(8000)
-    if not is_running:
+    # 查找所有后端服务进程
+    backend_processes = []
+    for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
+        try:
+            cmdline = ' '.join(proc.cmdline())
+            if 'uvicorn' in cmdline and 'main:app' in cmdline:
+                backend_processes.append(proc.pid)
+        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+            pass
+    
+    if not backend_processes:
         raise HTTPException(status_code=400, detail="后端服务未运行")
     
     try:
-        # 停止服务
-        os.kill(pid, signal.SIGTERM)
+        # 停止所有后端服务进程
+        for pid in backend_processes:
+            os.kill(pid, signal.SIGTERM)
         return {"message": "后端服务停止成功"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"停止后端服务失败: {str(e)}")
@@ -79,14 +89,23 @@ async def start_frontend_service():
 @router.post("/stop-frontend")
 async def stop_frontend_service():
     """停止前端服务"""
-    # 检查是否在运行
-    is_running, pid = check_service_status(5173)
-    if not is_running:
+    # 查找所有前端服务进程
+    frontend_processes = []
+    for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
+        try:
+            cmdline = ' '.join(proc.cmdline())
+            if 'vite' in cmdline and 'port 5173' in cmdline:
+                frontend_processes.append(proc.pid)
+        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+            pass
+    
+    if not frontend_processes:
         raise HTTPException(status_code=400, detail="前端服务未运行")
     
     try:
-        # 停止服务
-        os.kill(pid, signal.SIGTERM)
+        # 停止所有前端服务进程
+        for pid in frontend_processes:
+            os.kill(pid, signal.SIGTERM)
         return {"message": "前端服务停止成功"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"停止前端服务失败: {str(e)}")
