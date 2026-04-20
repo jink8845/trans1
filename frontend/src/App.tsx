@@ -25,11 +25,12 @@ const App: React.FC = () => {
     <Router>
       <Routes>
         <Route path="/login" element={<Login />} />
-        <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        <Route path="/" element={<ServiceManager />} />
+        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/sap" element={<ProtectedRoute><SAPOperations /></ProtectedRoute>} />
         <Route path="/requests" element={<ProtectedRoute><Requests /></ProtectedRoute>} />
         <Route path="/config" element={<ProtectedRoute><Config /></ProtectedRoute>} />
-        <Route path="/service" element={<ProtectedRoute><ServiceManager /></ProtectedRoute>} />
+        <Route path="/service" element={<ServiceManager />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>
